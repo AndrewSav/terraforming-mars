@@ -2,7 +2,7 @@ import {describeDatabaseSuite} from './databaseSuite';
 import {IGame} from '../../src/server/IGame';
 import {IN_MEMORY_SQLITE_PATH, SQLite} from '../../src/server/database/SQLite';
 import {GameId} from '../../src/common/Types';
-import {RunResult} from 'sqlite3';
+import {ResultSet} from '@libsql/client';
 import {ITestDatabase, Status} from './ITestDatabase';
 
 class TestSQLite extends SQLite implements ITestDatabase {
@@ -32,11 +32,11 @@ class TestSQLite extends SQLite implements ITestDatabase {
   }
 
   async completedTime(gameId: GameId): Promise<number | undefined> {
-    const row = await this.asyncGet('SELECT completed_time FROM completed_game WHERE game_id = $1', [gameId]);
+    const row = await this.asyncGet('SELECT completed_time FROM completed_game WHERE game_id = ?', [gameId]);
     return row.completed_time;
   }
 
-  setCompletedTime(gameId: GameId, timestampSeconds: number): Promise<RunResult> {
+  setCompletedTime(gameId: GameId, timestampSeconds: number): Promise<ResultSet> {
     return this.asyncRun('UPDATE completed_game SET completed_time = to_timestamp(?) WHERE game_id = ?', [timestampSeconds, gameId]);
   }
 }
